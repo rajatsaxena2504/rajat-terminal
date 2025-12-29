@@ -8,18 +8,18 @@ interface Props {
 
 const { title, description = "Builder, reader, creator." } = Astro.props;
 const currentPath = Astro.url.pathname;
+const base = import.meta.env.BASE_URL;
 
 const navLinks = [
-  { href: '/blogs', label: 'Blog' },
-  { href: '/projects', label: 'Projects' },
-  { href: '/books', label: 'Books' },
-  { href: '/ai-guide', label: 'AI Guide' },
-  { href: '/list-100', label: 'List 100' },
+  { href: `${base}blogs`, label: 'Blog' },
+  { href: `${base}projects`, label: 'Projects' },
+  { href: `${base}books`, label: 'Books' },
+  { href: `${base}ai-guide`, label: 'AI Guide' },
+  { href: `${base}list-100`, label: 'List 100' },
 ];
 
 function isActive(href: string): boolean {
-  if (href === '/') return currentPath === '/';
-  return currentPath.startsWith(href);
+  return currentPath.includes(href.replace(base, ''));
 }
 ---
 
@@ -28,7 +28,7 @@ function isActive(href: string): boolean {
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/svg+xml" href={`${base}favicon.svg`} />
     <title>{title} · rajat.terminal</title>
     <meta name="description" content={description} />
     <meta property="og:title" content={`${title} · rajat.terminal`} />
@@ -38,7 +38,7 @@ function isActive(href: string): boolean {
     <!-- Header -->
     <header class="site-header">
       <div class="header-inner">
-        <a href="/" class="site-name">
+        <a href={base} class="site-name">
           rajat<span>.terminal</span>
         </a>
 
@@ -72,7 +72,7 @@ function isActive(href: string): boolean {
         <div class="footer-content">
           <span>&copy; {new Date().getFullYear()} Rajat</span>
           <div class="social-links">
-            <a href="https://github.com/yourusername" class="social-link" target="_blank" rel="noopener">
+            <a href="https://github.com/rajatsaxena2504" class="social-link" target="_blank" rel="noopener">
               GitHub
             </a>
             <a href="https://twitter.com/yourusername" class="social-link" target="_blank" rel="noopener">
