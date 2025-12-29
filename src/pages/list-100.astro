@@ -1,0 +1,65 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+const items = [
+  { text: "Read 500 books", done: false, progress: "120/500" },
+  { text: "Read 1000 research papers", done: false, progress: "200/1000" },
+  { text: "Visit 30 countries", done: false, progress: "12/30" },
+  { text: "Give a conference talk", done: true },
+  { text: "Write a technical book", done: false },
+  { text: "Build a product with 10K users", done: false },
+  { text: "Run a marathon", done: false },
+  { text: "Learn to play piano", done: false },
+  { text: "See the Northern Lights", done: false },
+  { text: "Mentor 10 people", done: false, progress: "5/10" },
+  { text: "Take a solo trip", done: true },
+  { text: "Build an open source project with 1K stars", done: false },
+  { text: "Learn a new language", done: false },
+  { text: "Complete a digital detox week", done: false },
+  { text: "Meditate for 365 days straight", done: false, progress: "47/365" },
+];
+
+const completed = items.filter(i => i.done).length;
+---
+
+<BaseLayout title="List 100" description="100 things I want to do in my lifetime.">
+  <div class="container-main">
+    <section class="hero" style="padding-bottom: 40px;">
+      <h1 class="hero-title">List 100</h1>
+      <p class="hero-intro">
+        A bucket list of things I want to achieve, experience, and create.
+      </p>
+      <p style="font-family: 'JetBrains Mono', monospace; font-size: 14px; color: var(--accent); margin-top: 16px;">
+        {completed}/{items.length} completed
+      </p>
+    </section>
+
+    <div style="padding: 24px 0;">
+      {items.map((item, i) => (
+        <div style={`display: flex; align-items: center; gap: 16px; padding: 16px 0; border-bottom: 1px solid var(--border); ${item.done ? 'opacity: 0.5;' : ''}`}>
+          <span style={`width: 24px; height: 24px; border-radius: 50%; border: 2px solid ${item.done ? 'var(--accent)' : 'var(--border)'}; display: flex; align-items: center; justify-content: center; flex-shrink: 0;`}>
+            {item.done && (
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="3">
+                <path d="M5 13l4 4L19 7" />
+              </svg>
+            )}
+          </span>
+          <span style={`flex: 1; ${item.done ? 'text-decoration: line-through;' : ''}`}>
+            {item.text}
+          </span>
+          {item.progress && !item.done && (
+            <span style="font-size: 12px; font-family: 'JetBrains Mono', monospace; color: var(--foreground-muted);">
+              {item.progress}
+            </span>
+          )}
+        </div>
+      ))}
+    </div>
+
+    <p style="text-align: center; font-style: italic; color: var(--foreground-muted); margin-top: 48px;">
+      "The purpose of life is to live it, to taste experience to the utmost."
+      <br />
+      <span style="font-size: 14px;">— Eleanor Roosevelt</span>
+    </p>
+  </div>
+</BaseLayout>

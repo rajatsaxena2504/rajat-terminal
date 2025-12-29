@@ -1,0 +1,64 @@
+---
+import { getCollection, type CollectionEntry } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('blogs');
+  return posts.map((post) => ({
+    params: { slug: post.slug },
+    props: post,
+  }));
+}
+
+type Props = CollectionEntry<'blogs'>;
+
+const post = Astro.props;
+const { Content } = await post.render();
+
+const words = post.body.split(/\s+/).length;
+const readingTime = Math.ceil(words / 200);
+---
+
+<BaseLayout title={post.data.title} description={post.data.description}>
+  <article class="container-main">
+    <div style="padding: 60px 0 40px;">
+      <a href="/blogs" style="font-size: 14px; color: var(--foreground-muted);">
+        ← Back to blog
+      </a>
+    </div>
+
+    <header style="margin-bottom: 48px;">
+      <h1 style="font-size: 36px; line-height: 1.2; margin-bottom: 16px;">
+        {post.data.title}
+      </h1>
+      <div style="display: flex; gap: 16px; font-size: 14px; color: var(--foreground-muted);">
+        <time>
+          {post.data.pubDate.toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+          })}
+        </time>
+        <span>·</span>
+        <span>{readingTime} min read</span>
+      </div>
+      {post.data.tags.length > 0 && (
+        <div style="margin-top: 16px;">
+          {post.data.tags.map((tag) => (
+            <span class="tag">{tag}</span>
+          ))}
+        </div>
+      )}
+    </header>
+
+    <div class="prose">
+      <Content />
+    </div>
+
+    <footer style="margin-top: 64px; padding-top: 32px; border-top: 1px solid var(--border);">
+      <a href="/blogs" style="font-size: 14px; color: var(--accent);">
+        ← All posts
+      </a>
+    </footer>
+  </article>
+</BaseLayout>

@@ -1,0 +1,47 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+
+// Get all blog posts
+const allPosts = await getCollection('blogs', ({ data }) => !data.draft);
+const sortedPosts = allPosts.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+
+// Group by year
+const postsByYear = sortedPosts.reduce((acc, post) => {
+  const year = post.data.pubDate.getFullYear().toString();
+  if (!acc[year]) acc[year] = [];
+  acc[year].push(post);
+  return acc;
+}, {} as Record<string, typeof sortedPosts>);
+
+const years = Object.keys(postsByYear).sort((a, b) => parseInt(b) - parseInt(a));
+---
+
+<BaseLayout title="Blog" description="Writing about AI, engineering, and building things.">
+  <div class="container-main">
+    <section class="hero" style="padding-bottom: 40px;">
+      <h1 class="hero-title">Blog</h1>
+      <p class="hero-intro">
+        Thoughts on AI, engineering, research papers, and the journey of building.
+      </p>
+    </section>
+
+    {sortedPosts.length === 0 ? (
+      <p style="color: var(--foreground-muted);">No posts yet. Check back soon.</p>
+    ) : (
+      years.map((year) => (
+        <div class="posts-by-year">
+          <div class="year-label">{year}</div>
+          {postsByYear[year].map((post) => (
+            <a href={`/blogs/${post.slug}`} class="post-item">
+              <span class="post-title">{post.data.title}</span>
+              <span class="post-date">
+                {post.data.pubDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+              </span>
+            </a>
+          ))}
+        </div>
+      ))
+    )}
+  </div>
+</BaseLayout>

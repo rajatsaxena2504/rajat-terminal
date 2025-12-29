@@ -1,0 +1,68 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+const projects = [
+  {
+    title: "Neural Search Engine",
+    description: "Semantic search powered by transformer embeddings. Built for fast, accurate document retrieval at scale.",
+    tech: ["Python", "FastAPI", "FAISS", "Transformers"],
+    github: "#",
+    status: "Active"
+  },
+  {
+    title: "Paper Digest",
+    description: "AI-powered research paper summarization tool. Uses RAG to extract key insights from academic papers.",
+    tech: ["Next.js", "LangChain", "OpenAI", "PostgreSQL"],
+    github: "#",
+    status: "Active"
+  },
+  {
+    title: "ML Pipeline Framework",
+    description: "Opinionated framework for building production ML pipelines. Handles data validation, training, and deployment.",
+    tech: ["Python", "Docker", "Kubernetes", "MLflow"],
+    github: "#",
+    status: "Completed"
+  },
+  {
+    title: "Code Review Bot",
+    description: "GitHub bot that provides AI-powered code review suggestions on pull requests.",
+    tech: ["TypeScript", "GitHub Actions", "OpenAI"],
+    github: "#",
+    status: "Completed"
+  }
+];
+---
+
+<BaseLayout title="Projects" description="Things I've built and shipped.">
+  <div class="container-main">
+    <section class="hero" style="padding-bottom: 40px;">
+      <h1 class="hero-title">Projects</h1>
+      <p class="hero-intro">
+        Things I've built, shipped, and experimented with.
+      </p>
+    </section>
+
+    <div class="links-list" style="gap: 0;">
+      {projects.map((project) => (
+        <div style="padding: 24px 0; border-bottom: 1px solid var(--border);">
+          <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px;">
+            <h3 style="font-family: 'Inter', sans-serif; font-size: 18px; font-weight: 500;">
+              {project.title}
+            </h3>
+            <span style="font-size: 12px; font-family: 'JetBrains Mono', monospace; color: var(--foreground-muted);">
+              {project.status}
+            </span>
+          </div>
+          <p style="font-size: 15px; color: var(--foreground-secondary); margin-bottom: 12px;">
+            {project.description}
+          </p>
+          <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+            {project.tech.map((t) => (
+              <span class="tag">{t}</span>
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+</BaseLayout>
