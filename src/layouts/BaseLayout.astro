@@ -15,23 +15,16 @@ const navLinks = [
   { href: `${base}blogs/`, label: 'Blog' },
   { href: `${base}projects/`, label: 'Projects' },
   { href: `${base}books/`, label: 'Books' },
+  { href: `${base}list-50/`, label: 'List 50' },
 ];
 
-// Dropdown for learning content
+// Dropdown for learning content (at the end)
 const learnDropdown = {
   label: 'Learn',
   items: [
     { href: `${base}papers/`, label: 'Papers', desc: 'arXiv paper notes' },
     { href: `${base}system-design/`, label: 'System Design', desc: 'Architecture & patterns' },
     { href: `${base}ai-guide/`, label: 'AI Guide', desc: 'AI/ML resources' },
-  ],
-};
-
-// More dropdown
-const moreDropdown = {
-  label: 'More',
-  items: [
-    { href: `${base}list-100/`, label: 'List 100', desc: 'Life goals' },
   ],
 };
 
@@ -75,7 +68,7 @@ function isDropdownActive(items: { href: string }[]): boolean {
             </a>
           ))}
 
-          <!-- Learn Dropdown -->
+          <!-- Learn Dropdown (at the end) -->
           <div class={`nav-dropdown ${isDropdownActive(learnDropdown.items) ? 'active' : ''}`}>
             <button class="island-link dropdown-trigger">
               {learnDropdown.label}
@@ -85,24 +78,6 @@ function isDropdownActive(items: { href: string }[]): boolean {
             </button>
             <div class="dropdown-menu">
               {learnDropdown.items.map((item) => (
-                <a href={item.href} class={`dropdown-item ${isActive(item.href) ? 'active' : ''}`}>
-                  <span class="dropdown-item-label">{item.label}</span>
-                  <span class="dropdown-item-desc">{item.desc}</span>
-                </a>
-              ))}
-            </div>
-          </div>
-
-          <!-- More Dropdown -->
-          <div class={`nav-dropdown ${isDropdownActive(moreDropdown.items) ? 'active' : ''}`}>
-            <button class="island-link dropdown-trigger">
-              {moreDropdown.label}
-              <svg width="10" height="10" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M3 5l3 3 3-3" />
-              </svg>
-            </button>
-            <div class="dropdown-menu">
-              {moreDropdown.items.map((item) => (
                 <a href={item.href} class={`dropdown-item ${isActive(item.href) ? 'active' : ''}`}>
                   <span class="dropdown-item-label">{item.label}</span>
                   <span class="dropdown-item-desc">{item.desc}</span>
