@@ -99,6 +99,17 @@ src/
 
 ---
 
+## Navigation Structure
+
+```
+Blog | Projects | Books | List 50 | Learn (dropdown)
+                                      ├── Papers
+                                      ├── System Design
+                                      └── AI Guide
+```
+
+---
+
 ## Pending / Ideas
 
 - [ ] Projects page styling
@@ -113,12 +124,9 @@ src/
 
 ## Git Status
 
-Modified files (uncommitted):
-- `src/layouts/BaseLayout.astro`
-- `src/pages/blogs/index.astro` - hover effect
-- `src/pages/papers/index.astro` - hover effect
-- `src/pages/index.astro`
-- `src/styles/global.css`
+All changes committed and pushed to main. Latest commits:
+- `8ca65e6` - Move List 50 to main nav, remove More dropdown
+- `2ff00ce` - Add hover effects to blog and papers pages
 
 ---
 
