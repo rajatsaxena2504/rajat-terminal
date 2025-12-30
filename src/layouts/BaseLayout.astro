@@ -22,7 +22,6 @@ const learnDropdown = {
   label: 'Learn',
   items: [
     { href: `${base}papers/`, label: 'Papers', desc: 'arXiv paper notes' },
-    { href: `${base}notes/`, label: 'Notes', desc: 'Daily learnings' },
     { href: `${base}system-design/`, label: 'System Design', desc: 'Architecture & patterns' },
     { href: `${base}ai-guide/`, label: 'AI Guide', desc: 'AI/ML resources' },
   ],
@@ -135,7 +134,7 @@ function isDropdownActive(items: { href: string }[]): boolean {
     </main>
 
     <!-- Footer -->
-    <footer class="site-footer">
+    <footer class="site-footer scroll-reveal">
       <div class="container-main">
         <div class="footer-content">
           <span>&copy; {new Date().getFullYear()} Rajat</span>
@@ -181,6 +180,33 @@ function isDropdownActive(items: { href: string }[]): boolean {
           document.querySelectorAll('.nav-dropdown').forEach(d => d.classList.remove('open'));
         }
       });
+
+      // Scroll-triggered animations with Intersection Observer
+      const scrollRevealElements = document.querySelectorAll('.scroll-reveal');
+
+      const revealObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('revealed');
+            // Optional: unobserve after revealing (animate once)
+            revealObserver.unobserve(entry.target);
+          }
+        });
+      }, {
+        threshold: 0.1,
+        rootMargin: '0px 0px -50px 0px'
+      });
+
+      scrollRevealElements.forEach(el => revealObserver.observe(el));
+
+      // Parallax effect on background gradient
+      const parallaxBg = document.querySelector('.bio-bg-gradient');
+      if (parallaxBg) {
+        window.addEventListener('scroll', () => {
+          const scrollY = window.scrollY;
+          (parallaxBg as HTMLElement).style.transform = `translateY(${scrollY * 0.3}px)`;
+        }, { passive: true });
+      }
     </script>
   </body>
 </html>

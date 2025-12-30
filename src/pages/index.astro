@@ -15,11 +15,6 @@ const recentPapers = allPapers
   .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
   .slice(0, 3);
 
-const allNotes = await getCollection('notes', ({ data }) => !data.draft);
-const recentNotes = allNotes
-  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
-  .slice(0, 3);
-
 const allBooks = await getCollection('books');
 const currentlyReading = allBooks.filter(book => book.data.status === 'reading').slice(0, 2);
 ---
@@ -45,12 +40,28 @@ const currentlyReading = allBooks.filter(book => book.data.status === 'reading')
           When I'm not coding, you'll find me reading technical papers, exploring new programming paradigms, or working through my ever-growing reading list. I'm always open to connecting with fellow engineers and discussing interesting problems.
         </p>
 
-        <!-- Navigation links -->
-        <div class="bio-nav">
-          <a href={`${base}papers/`} class="bio-nav-link">Paper Notes</a>
-          <a href={`${base}projects/`} class="bio-nav-link">Projects</a>
-          <a href={`${base}blogs/`} class="bio-nav-link">Blog</a>
-          <a href={`${base}notes/`} class="bio-nav-link">Notes</a>
+        <!-- Quick Links -->
+        <div class="bio-links">
+          <a href={`${base}papers/`} class="bio-link">
+            <span class="bio-link-label">Learn</span>
+            <span class="bio-link-title">Papers</span>
+            <span class="bio-link-desc">· arXiv deep dives</span>
+          </a>
+          <a href={`${base}blogs/`} class="bio-link">
+            <span class="bio-link-label">Write</span>
+            <span class="bio-link-title">Blog</span>
+            <span class="bio-link-desc">· Engineering</span>
+          </a>
+          <a href={`${base}projects/`} class="bio-link">
+            <span class="bio-link-label">Build</span>
+            <span class="bio-link-title">Projects</span>
+            <span class="bio-link-desc">· OSS & side work</span>
+          </a>
+          <a href={`${base}books/`} class="bio-link">
+            <span class="bio-link-label">Read</span>
+            <span class="bio-link-title">Books</span>
+            <span class="bio-link-desc">· Reading list</span>
+          </a>
         </div>
       </div>
 
@@ -88,100 +99,4 @@ const currentlyReading = allBooks.filter(book => book.data.status === 'reading')
     </div>
   </section>
 
-  <div class="container-main">
-    <!-- Recent Paper Notes -->
-    <section class="section">
-      <h2 class="section-title">Paper Notes</h2>
-      <div class="links-list">
-        {recentPapers.length > 0 ? (
-          recentPapers.map((paper) => (
-            <a href={`${base}papers/${paper.slug}/`} class="link-item">
-              <span class="link-title">{paper.data.title}</span>
-              <span class="link-meta">
-                {paper.data.pubDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
-              </span>
-            </a>
-          ))
-        ) : (
-          <p style="color: var(--foreground-muted);">Paper notes coming soon...</p>
-        )}
-      </div>
-      <a href={`${base}papers/`} style="display: inline-block; margin-top: 24px; font-size: 14px; color: var(--accent);">
-        All paper notes →
-      </a>
-    </section>
-
-    <!-- Recent Learning Notes -->
-    <section class="section">
-      <h2 class="section-title">Learning Notes</h2>
-      <div class="links-list">
-        {recentNotes.length > 0 ? (
-          recentNotes.map((note) => (
-            <a href={`${base}notes/${note.slug}/`} class="link-item">
-              <span class="link-title">{note.data.title}</span>
-              <span class="link-meta" style="text-transform: capitalize;">
-                {note.data.category.replace('-', ' ')}
-              </span>
-            </a>
-          ))
-        ) : (
-          <p style="color: var(--foreground-muted);">Notes coming soon...</p>
-        )}
-      </div>
-      <a href={`${base}notes/`} style="display: inline-block; margin-top: 24px; font-size: 14px; color: var(--accent);">
-        All notes →
-      </a>
-    </section>
-
-    <!-- Recent Writing -->
-    <section class="section">
-      <h2 class="section-title">Blog</h2>
-      <div class="links-list">
-        {recentPosts.length > 0 ? (
-          recentPosts.map((post) => (
-            <a href={`${base}blogs/${post.slug}/`} class="link-item">
-              <span class="link-title">{post.data.title}</span>
-              <span class="link-meta">
-                {post.data.pubDate.toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}
-              </span>
-            </a>
-          ))
-        ) : (
-          <p style="color: var(--foreground-muted);">Blog posts coming soon...</p>
-        )}
-      </div>
-      <a href={`${base}blogs/`} style="display: inline-block; margin-top: 24px; font-size: 14px; color: var(--accent);">
-        All posts →
-      </a>
-    </section>
-
-    <!-- Currently Reading -->
-    <section class="section">
-      <h2 class="section-title">Currently Reading</h2>
-      <div class="links-list">
-        {currentlyReading.length > 0 ? (
-          currentlyReading.map((book) => (
-            <div class="link-item">
-              <span class="link-title">{book.data.title}</span>
-              <span class="link-meta">{book.data.author}</span>
-            </div>
-          ))
-        ) : (
-          <>
-            <div class="link-item">
-              <span class="link-title">Staff Engineer</span>
-              <span class="link-meta">Will Larson</span>
-            </div>
-            <div class="link-item">
-              <span class="link-title">Designing Data-Intensive Applications</span>
-              <span class="link-meta">Martin Kleppmann</span>
-            </div>
-          </>
-        )}
-      </div>
-      <a href={`${base}books/`} style="display: inline-block; margin-top: 24px; font-size: 14px; color: var(--accent);">
-        View reading list →
-      </a>
-    </section>
-  </div>
 </BaseLayout>

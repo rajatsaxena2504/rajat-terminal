@@ -43,7 +43,9 @@ const months = Object.keys(papersByMonth);
           {papersByMonth[month].map((paper) => (
             <a href={`${base}papers/${paper.slug}/`} class="paper-item">
               <div class="paper-content">
-                <span class="post-title">{paper.data.title}</span>
+                <span class="post-title">
+                  <span class="post-title-wrapper">{paper.data.title}</span>
+                </span>
                 {paper.data.tldr && (
                   <span class="paper-tldr">{paper.data.tldr}</span>
                 )}
@@ -53,9 +55,16 @@ const months = Object.keys(papersByMonth);
                   ))}
                 </div>
               </div>
-              <span class="post-date">
-                {paper.data.pubDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
-              </span>
+              <div class="paper-right">
+                <span class="post-date">
+                  {paper.data.pubDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }).toUpperCase()}
+                </span>
+                <span class="post-arrow">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M5 12h14M12 5l7 7-7 7"/>
+                  </svg>
+                </span>
+              </div>
             </a>
           ))}
         </div>
@@ -69,30 +78,105 @@ const months = Object.keys(papersByMonth);
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-    padding: 16px 0;
-    border-bottom: 1px solid var(--border);
-    transition: all 0.2s ease;
+    padding: 18px 16px;
+    margin: 0 -16px;
+    border-radius: 8px;
+    text-decoration: none;
+    position: relative;
     gap: 16px;
+    transition: background 0.3s ease;
+  }
+
+  /* Separator lines */
+  .paper-item::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 16px;
+    right: 16px;
+    height: 1px;
+    background: var(--border);
+    transition: opacity 0.3s ease;
+  }
+
+  .paper-item:first-child::before {
+    display: none;
+  }
+
+  .paper-item:hover::before {
+    opacity: 0;
   }
 
   .paper-item:hover {
-    padding-left: 8px;
-  }
-
-  .paper-item:last-child {
-    border-bottom: none;
+    background: rgba(88, 166, 255, 0.04);
   }
 
   .paper-content {
     display: flex;
     flex-direction: column;
     gap: 6px;
+    flex: 1;
+  }
+
+  .post-title {
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--foreground);
+    position: relative;
+    z-index: 1;
+    transition: color 0.3s ease;
+  }
+
+  /* Title wrapper for bracket effect */
+  .post-title-wrapper {
+    position: relative;
+    display: inline;
+  }
+
+  /* Corner brackets */
+  .post-title-wrapper::before,
+  .post-title-wrapper::after {
+    content: '';
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    opacity: 0;
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  /* Top-left corner */
+  .post-title-wrapper::before {
+    top: -4px;
+    left: -12px;
+    border-top: 2px solid var(--accent);
+    border-left: 2px solid var(--accent);
+    transform: translate(4px, 4px);
+  }
+
+  /* Bottom-right corner */
+  .post-title-wrapper::after {
+    bottom: -4px;
+    right: -12px;
+    border-bottom: 2px solid var(--accent);
+    border-right: 2px solid var(--accent);
+    transform: translate(-4px, -4px);
+  }
+
+  .paper-item:hover .post-title-wrapper::before,
+  .paper-item:hover .post-title-wrapper::after {
+    opacity: 1;
+    transform: translate(0, 0);
   }
 
   .paper-tldr {
     font-size: 14px;
     color: var(--foreground-muted);
     line-height: 1.4;
+    transition: color 0.3s ease;
+  }
+
+  .paper-item:hover .paper-tldr {
+    color: var(--foreground-secondary);
   }
 
   .paper-meta {
@@ -108,5 +192,73 @@ const months = Object.keys(papersByMonth);
     color: var(--foreground-muted);
     border-radius: 4px;
     font-family: 'JetBrains Mono', monospace;
+    transition: all 0.3s ease;
+  }
+
+  .paper-item:hover .tag-small {
+    background: rgba(88, 166, 255, 0.1);
+    color: var(--accent);
+  }
+
+  .paper-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-shrink: 0;
+  }
+
+  .post-date {
+    font-family: 'JetBrains Mono', 'Fira Code', monospace;
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--foreground-muted);
+    letter-spacing: 0.1em;
+    transition: color 0.3s ease;
+  }
+
+  .paper-item:hover .post-date {
+    color: var(--accent);
+  }
+
+  /* Arrow indicator */
+  .post-arrow {
+    display: flex;
+    align-items: center;
+    opacity: 0;
+    transform: translateX(-8px);
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    color: var(--accent);
+  }
+
+  .paper-item:hover .post-arrow {
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  @media (max-width: 640px) {
+    .paper-item {
+      flex-direction: column;
+      padding: 14px 12px;
+      margin: 0 -12px;
+      gap: 8px;
+    }
+
+    .paper-item::before {
+      left: 12px;
+      right: 12px;
+    }
+
+    .paper-right {
+      align-self: flex-start;
+    }
+
+    .post-arrow {
+      display: none;
+    }
+
+    .post-title-wrapper::before,
+    .post-title-wrapper::after {
+      display: none;
+    }
   }
 </style>

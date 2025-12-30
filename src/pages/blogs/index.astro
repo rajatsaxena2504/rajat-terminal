@@ -17,33 +17,304 @@ const postsByYear = sortedPosts.reduce((acc, post) => {
 }, {} as Record<string, typeof sortedPosts>);
 
 const years = Object.keys(postsByYear).sort((a, b) => parseInt(b) - parseInt(a));
+
+// Format date like "OCT 14"
+function formatDate(date: Date): string {
+  return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }).toUpperCase();
+}
 ---
 
 <BaseLayout title="Blog" description="Writing about AI, engineering, and building things.">
-  <div class="container-main">
-    <section class="hero" style="padding-bottom: 40px;">
-      <h1 class="hero-title">Blog</h1>
-      <p class="hero-intro">
+  <section class="blog-page">
+    <div class="blog-header">
+      <h1 class="blog-title">Blog</h1>
+      <p class="blog-intro">
         Thoughts on AI, engineering, research papers, and the journey of building.
       </p>
-    </section>
+    </div>
 
     {sortedPosts.length === 0 ? (
-      <p style="color: var(--foreground-muted);">No posts yet. Check back soon.</p>
+      <p class="blog-empty">No posts yet. Check back soon.</p>
     ) : (
-      years.map((year) => (
-        <div class="posts-by-year">
-          <div class="year-label">{year}</div>
-          {postsByYear[year].map((post) => (
-            <a href={`${base}blogs/${post.slug}`} class="post-item">
-              <span class="post-title">{post.data.title}</span>
-              <span class="post-date">
-                {post.data.pubDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
-              </span>
-            </a>
-          ))}
-        </div>
-      ))
+      <div class="blog-list">
+        {years.map((year) => (
+          <div class="year-section">
+            <div class="year-label">{year}</div>
+            <div class="posts-list">
+              {postsByYear[year].map((post, index) => (
+                <a
+                  href={`${base}blogs/${post.slug}/`}
+                  class="post-row"
+                  style={`--delay: ${index * 0.05}s`}
+                >
+                  <span class="post-title">
+                    <span class="post-title-wrapper">{post.data.title}</span>
+                  </span>
+                  <span class="post-date">{formatDate(post.data.pubDate)}</span>
+                  <span class="post-arrow">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M5 12h14M12 5l7 7-7 7"/>
+                    </svg>
+                  </span>
+                </a>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
     )}
-  </div>
+  </section>
 </BaseLayout>
+
+<style>
+  .blog-page {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 140px 24px 80px;
+  }
+
+  .blog-header {
+    margin-bottom: 60px;
+    text-align: center;
+    opacity: 0;
+    animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  .blog-title {
+    font-family: 'Satoshi', 'Inter', sans-serif;
+    font-size: 3rem;
+    font-weight: 700;
+    color: var(--foreground);
+    margin-bottom: 16px;
+    letter-spacing: -0.02em;
+  }
+
+  .blog-intro {
+    font-size: 1.125rem;
+    color: var(--foreground-secondary);
+    line-height: 1.6;
+    max-width: 500px;
+    margin: 0 auto;
+  }
+
+  .blog-empty {
+    color: var(--foreground-muted);
+    text-align: center;
+    padding: 40px 0;
+  }
+
+  .blog-list {
+    opacity: 0;
+    animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.15s forwards;
+  }
+
+  .year-section {
+    margin-bottom: 48px;
+  }
+
+  .year-label {
+    font-family: 'JetBrains Mono', 'Fira Code', monospace;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--foreground-muted);
+    margin-bottom: 20px;
+    letter-spacing: 0.05em;
+  }
+
+  .posts-list {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .post-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 18px 16px;
+    margin: 0 -16px;
+    border-radius: 8px;
+    text-decoration: none;
+    position: relative;
+    opacity: 0;
+    animation: slideIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) calc(var(--delay, 0s) + 0.25s) forwards;
+    transition: background 0.3s ease;
+  }
+
+  /* Separator lines */
+  .post-row::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 16px;
+    right: 16px;
+    height: 1px;
+    background: var(--border);
+    transition: opacity 0.3s ease;
+  }
+
+  .post-row:first-child::before {
+    display: none;
+  }
+
+  .post-row:hover::before {
+    opacity: 0;
+  }
+
+  .post-row:hover {
+    background: rgba(88, 166, 255, 0.04);
+  }
+
+  .post-title {
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--foreground);
+    flex: 1;
+    padding-right: 20px;
+    position: relative;
+    z-index: 1;
+    transition: color 0.3s ease;
+  }
+
+  /* Title wrapper for bracket effect */
+  .post-title-wrapper {
+    position: relative;
+    display: inline-block;
+  }
+
+  /* Corner brackets */
+  .post-title-wrapper::before,
+  .post-title-wrapper::after {
+    content: '';
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    opacity: 0;
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  /* Top-left corner */
+  .post-title-wrapper::before {
+    top: -4px;
+    left: -12px;
+    border-top: 2px solid var(--accent);
+    border-left: 2px solid var(--accent);
+    transform: translate(4px, 4px);
+  }
+
+  /* Bottom-right corner */
+  .post-title-wrapper::after {
+    bottom: -4px;
+    right: -12px;
+    border-bottom: 2px solid var(--accent);
+    border-right: 2px solid var(--accent);
+    transform: translate(-4px, -4px);
+  }
+
+  .post-row:hover .post-title-wrapper::before,
+  .post-row:hover .post-title-wrapper::after {
+    opacity: 1;
+    transform: translate(0, 0);
+  }
+
+  .post-row:hover .post-title {
+    color: var(--foreground);
+  }
+
+  /* Arrow indicator */
+  .post-arrow {
+    display: flex;
+    align-items: center;
+    margin-left: 12px;
+    opacity: 0;
+    transform: translateX(-8px);
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    color: var(--accent);
+  }
+
+  .post-row:hover .post-arrow {
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  .post-date {
+    font-family: 'JetBrains Mono', 'Fira Code', monospace;
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--foreground-muted);
+    letter-spacing: 0.1em;
+    flex-shrink: 0;
+    position: relative;
+    z-index: 1;
+    transition: color 0.3s ease;
+  }
+
+  .post-row:hover .post-date {
+    color: var(--accent);
+  }
+
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes slideIn {
+    from {
+      opacity: 0;
+      transform: translateX(-20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  @media (max-width: 640px) {
+    .blog-page {
+      padding: 120px 20px 60px;
+    }
+
+    .blog-title {
+      font-size: 2.25rem;
+    }
+
+    .blog-intro {
+      font-size: 1rem;
+    }
+
+    .post-row {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 6px;
+      padding: 14px 12px;
+      margin: 0 -12px;
+    }
+
+    .post-row::before {
+      left: 12px;
+      right: 12px;
+    }
+
+    .post-title {
+      padding-right: 0;
+    }
+
+    .post-date {
+      font-size: 0.7rem;
+    }
+
+    .post-arrow {
+      display: none;
+    }
+
+    .post-title-wrapper::before,
+    .post-title-wrapper::after {
+      display: none;
+    }
+  }
+</style>
