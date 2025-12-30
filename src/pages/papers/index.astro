@@ -1,0 +1,112 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+
+const base = import.meta.env.BASE_URL;
+
+// Get all paper notes
+const allPapers = await getCollection('papers', ({ data }) => !data.draft);
+const sortedPapers = allPapers.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+
+// Group by month/year
+const papersByMonth = sortedPapers.reduce((acc, paper) => {
+  const monthYear = paper.data.pubDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+  if (!acc[monthYear]) acc[monthYear] = [];
+  acc[monthYear].push(paper);
+  return acc;
+}, {} as Record<string, typeof sortedPapers>);
+
+const months = Object.keys(papersByMonth);
+---
+
+<BaseLayout title="Papers" description="Notes and learnings from research papers I'm reading.">
+  <div class="container-main">
+    <section class="hero" style="padding-bottom: 40px;">
+      <h1 class="hero-title">Paper Notes</h1>
+      <p class="hero-intro">
+        Learnings from research papers, mostly from arXiv. I read papers on ML, distributed systems,
+        and whatever catches my interest. These are my notes and key takeaways.
+      </p>
+    </section>
+
+    {sortedPapers.length === 0 ? (
+      <div style="padding: 40px 0; text-align: center;">
+        <p style="color: var(--foreground-muted); margin-bottom: 16px;">No paper notes yet.</p>
+        <p style="color: var(--foreground-muted); font-size: 14px;">
+          Check back soon - I'm always reading something interesting!
+        </p>
+      </div>
+    ) : (
+      months.map((month) => (
+        <div class="posts-by-year">
+          <div class="year-label">{month}</div>
+          {papersByMonth[month].map((paper) => (
+            <a href={`${base}papers/${paper.slug}/`} class="paper-item">
+              <div class="paper-content">
+                <span class="post-title">{paper.data.title}</span>
+                {paper.data.tldr && (
+                  <span class="paper-tldr">{paper.data.tldr}</span>
+                )}
+                <div class="paper-meta">
+                  {paper.data.tags.slice(0, 3).map((tag) => (
+                    <span class="tag-small">{tag}</span>
+                  ))}
+                </div>
+              </div>
+              <span class="post-date">
+                {paper.data.pubDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+              </span>
+            </a>
+          ))}
+        </div>
+      ))
+    )}
+  </div>
+</BaseLayout>
+
+<style>
+  .paper-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 16px 0;
+    border-bottom: 1px solid var(--border);
+    transition: all 0.2s ease;
+    gap: 16px;
+  }
+
+  .paper-item:hover {
+    padding-left: 8px;
+  }
+
+  .paper-item:last-child {
+    border-bottom: none;
+  }
+
+  .paper-content {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .paper-tldr {
+    font-size: 14px;
+    color: var(--foreground-muted);
+    line-height: 1.4;
+  }
+
+  .paper-meta {
+    display: flex;
+    gap: 6px;
+    margin-top: 4px;
+  }
+
+  .tag-small {
+    font-size: 11px;
+    padding: 2px 8px;
+    background: var(--background-secondary);
+    color: var(--foreground-muted);
+    border-radius: 4px;
+    font-family: 'JetBrains Mono', monospace;
+  }
+</style>

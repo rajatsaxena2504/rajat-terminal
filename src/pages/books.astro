@@ -1,19 +1,23 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
 
-const currentlyReading = [
-  { title: "Staff Engineer", author: "Will Larson" },
-  { title: "The Art of Doing Science and Engineering", author: "Richard Hamming" },
-];
+const base = import.meta.env.BASE_URL;
 
-const completed = [
-  { title: "Designing Data-Intensive Applications", author: "Martin Kleppmann", rating: 5 },
-  { title: "The Pragmatic Programmer", author: "David Thomas & Andrew Hunt", rating: 5 },
-  { title: "Thinking, Fast and Slow", author: "Daniel Kahneman", rating: 4 },
-  { title: "Atomic Habits", author: "James Clear", rating: 4 },
-  { title: "Deep Work", author: "Cal Newport", rating: 5 },
-  { title: "Zero to One", author: "Peter Thiel", rating: 4 },
-];
+// Get all books from collection
+const allBooks = await getCollection('books');
+
+const currentlyReading = allBooks
+  .filter(book => book.data.status === 'reading')
+  .sort((a, b) => b.data.dateRead.valueOf() - a.data.dateRead.valueOf());
+
+const completed = allBooks
+  .filter(book => book.data.status === 'completed')
+  .sort((a, b) => b.data.dateRead.valueOf() - a.data.dateRead.valueOf());
+
+const wantToRead = allBooks
+  .filter(book => book.data.status === 'want-to-read')
+  .sort((a, b) => a.data.title.localeCompare(b.data.title));
 
 function stars(n: number) {
   return '★'.repeat(n) + '☆'.repeat(5 - n);
@@ -25,37 +29,180 @@ function stars(n: number) {
     <section class="hero" style="padding-bottom: 40px;">
       <h1 class="hero-title">Books</h1>
       <p class="hero-intro">
-        What I'm reading and books that shaped my thinking.
+        What I'm reading and books that shaped my thinking. I try to read across topics -
+        engineering, design, business, and personal growth.
+      </p>
+      <p style="margin-top: 16px; font-size: 14px; color: var(--foreground-muted);">
+        <a href="https://www.goodreads.com/user/show/YOUR_ID" target="_blank" rel="noopener" style="color: var(--accent);">
+          Follow me on Goodreads →
+        </a>
       </p>
     </section>
 
-    <section class="section">
-      <h2 class="section-title">Currently Reading</h2>
-      <div class="links-list">
-        {currentlyReading.map((book) => (
-          <div class="link-item">
-            <span class="link-title">{book.title}</span>
-            <span class="link-meta">{book.author}</span>
-          </div>
-        ))}
-      </div>
-    </section>
-
-    <section class="section">
-      <h2 class="section-title">Completed</h2>
-      <div class="links-list">
-        {completed.map((book) => (
-          <div class="link-item">
-            <div>
-              <span class="link-title">{book.title}</span>
-              <span style="display: block; font-size: 14px; color: var(--foreground-muted); margin-top: 4px;">
-                {book.author}
-              </span>
+    {currentlyReading.length > 0 && (
+      <section class="section">
+        <h2 class="section-title">Currently Reading</h2>
+        <div class="books-grid">
+          {currentlyReading.map((book) => (
+            <div class="book-card reading">
+              <div class="book-status">Reading</div>
+              <h3 class="book-title">{book.data.title}</h3>
+              <p class="book-author">{book.data.author}</p>
+              {book.data.tags.length > 0 && (
+                <div class="book-tags">
+                  {book.data.tags.slice(0, 2).map((tag) => (
+                    <span class="tag-tiny">{tag}</span>
+                  ))}
+                </div>
+              )}
             </div>
-            <span class="link-meta" style="color: #fbbf24;">{stars(book.rating)}</span>
-          </div>
-        ))}
-      </div>
-    </section>
+          ))}
+        </div>
+      </section>
+    )}
+
+    {completed.length > 0 && (
+      <section class="section">
+        <h2 class="section-title">Completed ({completed.length})</h2>
+        <div class="books-list">
+          {completed.map((book) => (
+            <div class="book-item">
+              <div class="book-info">
+                <span class="book-title-inline">{book.data.title}</span>
+                <span class="book-author-inline">{book.data.author}</span>
+              </div>
+              <div class="book-rating" style="color: var(--accent);">
+                {stars(book.data.rating)}
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+    )}
+
+    {wantToRead.length > 0 && (
+      <section class="section">
+        <h2 class="section-title">Want to Read</h2>
+        <div class="books-list">
+          {wantToRead.map((book) => (
+            <div class="book-item">
+              <div class="book-info">
+                <span class="book-title-inline">{book.data.title}</span>
+                <span class="book-author-inline">{book.data.author}</span>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+    )}
+
+    {allBooks.length === 0 && (
+      <section class="section">
+        <p style="color: var(--foreground-muted); text-align: center; padding: 40px 0;">
+          Book list coming soon. In the meantime, check out my Goodreads!
+        </p>
+      </section>
+    )}
   </div>
 </BaseLayout>
+
+<style>
+  .books-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 16px;
+  }
+
+  .book-card {
+    padding: 20px;
+    background: var(--background-secondary);
+    border-radius: 12px;
+    border: 1px solid var(--border);
+  }
+
+  .book-card.reading {
+    border-left: 3px solid var(--accent);
+  }
+
+  .book-status {
+    font-size: 11px;
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 8px;
+  }
+
+  .book-title {
+    font-size: 18px;
+    font-weight: 500;
+    margin-bottom: 4px;
+    font-family: 'Inter', sans-serif;
+  }
+
+  .book-author {
+    font-size: 14px;
+    color: var(--foreground-muted);
+  }
+
+  .book-tags {
+    display: flex;
+    gap: 6px;
+    margin-top: 12px;
+  }
+
+  .tag-tiny {
+    font-size: 11px;
+    padding: 2px 8px;
+    background: var(--background);
+    color: var(--foreground-muted);
+    border-radius: 4px;
+  }
+
+  .books-list {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .book-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 0;
+    border-bottom: 1px solid var(--border);
+    gap: 16px;
+  }
+
+  .book-item:last-child {
+    border-bottom: none;
+  }
+
+  .book-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .book-title-inline {
+    font-size: 16px;
+    font-weight: 500;
+  }
+
+  .book-author-inline {
+    font-size: 14px;
+    color: var(--foreground-muted);
+  }
+
+  .book-rating {
+    flex-shrink: 0;
+    font-size: 14px;
+    letter-spacing: 2px;
+  }
+
+  @media (max-width: 640px) {
+    .book-item {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+  }
+</style>

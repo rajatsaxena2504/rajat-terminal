@@ -1,0 +1,102 @@
+---
+import { getCollection, type CollectionEntry } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+const base = import.meta.env.BASE_URL;
+
+export async function getStaticPaths() {
+  const notes = await getCollection('notes');
+  return notes.map((note) => ({
+    params: { slug: note.slug },
+    props: note,
+  }));
+}
+
+type Props = CollectionEntry<'notes'>;
+
+const note = Astro.props;
+const { Content } = await note.render();
+
+const categoryLabels: Record<string, string> = {
+  'system-design': 'System Design',
+  'distributed-systems': 'Distributed Systems',
+  'algorithms': 'Algorithms',
+  'databases': 'Databases',
+  'ml': 'Machine Learning',
+  'web': 'Web Development',
+  'devops': 'DevOps',
+  'other': 'Other',
+};
+
+const words = note.body.split(/\s+/).length;
+const readingTime = Math.ceil(words / 200);
+---
+
+<BaseLayout title={note.data.title} description={`Learning notes: ${note.data.title}`}>
+  <article class="container-main">
+    <div style="padding: 60px 0 40px;">
+      <a href={`${base}notes/`} style="font-size: 14px; color: var(--foreground-muted);">
+        ← Back to notes
+      </a>
+    </div>
+
+    <header style="margin-bottom: 48px;">
+      <div class="note-category-header">
+        {categoryLabels[note.data.category] || note.data.category}
+      </div>
+
+      <h1 style="font-size: 36px; line-height: 1.2; margin-bottom: 16px;">
+        {note.data.title}
+      </h1>
+
+      <div style="display: flex; gap: 16px; font-size: 14px; color: var(--foreground-muted); flex-wrap: wrap;">
+        <time>
+          {note.data.pubDate.toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+          })}
+        </time>
+        <span>·</span>
+        <span>{readingTime} min read</span>
+        {note.data.source && (
+          <>
+            <span>·</span>
+            <a href={note.data.source} target="_blank" rel="noopener" style="color: var(--accent);">
+              Source ↗
+            </a>
+          </>
+        )}
+      </div>
+
+      {note.data.tags.length > 0 && (
+        <div style="margin-top: 16px;">
+          {note.data.tags.map((tag) => (
+            <span class="tag">{tag}</span>
+          ))}
+        </div>
+      )}
+    </header>
+
+    <div class="prose">
+      <Content />
+    </div>
+
+    <footer style="margin-top: 64px; padding-top: 32px; border-top: 1px solid var(--border);">
+      <a href={`${base}notes/`} style="font-size: 14px; color: var(--accent);">
+        ← All notes
+      </a>
+    </footer>
+  </article>
+</BaseLayout>
+
+<style>
+  .note-category-header {
+    font-size: 12px;
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 12px;
+  }
+</style>

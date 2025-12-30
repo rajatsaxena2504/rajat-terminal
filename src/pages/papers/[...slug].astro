@@ -1,0 +1,121 @@
+---
+import { getCollection, type CollectionEntry } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+const base = import.meta.env.BASE_URL;
+
+export async function getStaticPaths() {
+  const papers = await getCollection('papers');
+  return papers.map((paper) => ({
+    params: { slug: paper.slug },
+    props: paper,
+  }));
+}
+
+type Props = CollectionEntry<'papers'>;
+
+const paper = Astro.props;
+const { Content } = await paper.render();
+
+const words = paper.body.split(/\s+/).length;
+const readingTime = Math.ceil(words / 200);
+---
+
+<BaseLayout title={paper.data.title} description={paper.data.tldr || `Notes on ${paper.data.paperTitle}`}>
+  <article class="container-main">
+    <div style="padding: 60px 0 40px;">
+      <a href={`${base}papers/`} style="font-size: 14px; color: var(--foreground-muted);">
+        ← Back to papers
+      </a>
+    </div>
+
+    <header style="margin-bottom: 48px;">
+      <h1 style="font-size: 36px; line-height: 1.2; margin-bottom: 16px;">
+        {paper.data.title}
+      </h1>
+
+      <div class="paper-info">
+        <div style="font-size: 14px; color: var(--foreground-muted); margin-bottom: 12px;">
+          <strong>Paper:</strong> {paper.data.paperTitle}
+        </div>
+
+        {paper.data.authors.length > 0 && (
+          <div style="font-size: 14px; color: var(--foreground-muted); margin-bottom: 12px;">
+            <strong>Authors:</strong> {paper.data.authors.join(', ')}
+          </div>
+        )}
+
+        <div style="display: flex; gap: 16px; font-size: 14px; color: var(--foreground-muted); flex-wrap: wrap;">
+          <time>
+            {paper.data.pubDate.toLocaleDateString('en-US', {
+              year: 'numeric',
+              month: 'long',
+              day: 'numeric'
+            })}
+          </time>
+          <span>·</span>
+          <span>{readingTime} min read</span>
+          {paper.data.arxivUrl && (
+            <>
+              <span>·</span>
+              <a href={paper.data.arxivUrl} target="_blank" rel="noopener" style="color: var(--accent);">
+                arXiv ↗
+              </a>
+            </>
+          )}
+          {paper.data.pdfUrl && (
+            <>
+              <span>·</span>
+              <a href={paper.data.pdfUrl} target="_blank" rel="noopener" style="color: var(--accent);">
+                PDF ↗
+              </a>
+            </>
+          )}
+        </div>
+      </div>
+
+      {paper.data.tldr && (
+        <div class="tldr-box">
+          <strong>TL;DR:</strong> {paper.data.tldr}
+        </div>
+      )}
+
+      {paper.data.tags.length > 0 && (
+        <div style="margin-top: 16px;">
+          {paper.data.tags.map((tag) => (
+            <span class="tag">{tag}</span>
+          ))}
+        </div>
+      )}
+    </header>
+
+    <div class="prose">
+      <Content />
+    </div>
+
+    <footer style="margin-top: 64px; padding-top: 32px; border-top: 1px solid var(--border);">
+      <a href={`${base}papers/`} style="font-size: 14px; color: var(--accent);">
+        ← All paper notes
+      </a>
+    </footer>
+  </article>
+</BaseLayout>
+
+<style>
+  .paper-info {
+    padding: 16px;
+    background: var(--background-secondary);
+    border-radius: 8px;
+    margin-bottom: 16px;
+  }
+
+  .tldr-box {
+    padding: 16px;
+    background: rgba(232, 93, 4, 0.08);
+    border-left: 3px solid var(--accent);
+    border-radius: 0 8px 8px 0;
+    font-size: 15px;
+    line-height: 1.6;
+    margin-top: 16px;
+  }
+</style>
